@@ -3,7 +3,7 @@ import axios from '@/libs/api.request'
 
 export const addArticle = (data) => {
   return axios.request({
-    url: '/article',
+    url: '/articles',
     data,
     method: 'post'
   })
@@ -15,7 +15,7 @@ export const getArticleList = (page, pageSize) => {
     pagesize:pageSize
   }
   return axios.request({
-    url: '/article',
+    url: '/articles',
     params: data,
     method: 'get'
   })
@@ -23,14 +23,14 @@ export const getArticleList = (page, pageSize) => {
 
 export const getArticle = (id) => {
   return axios.request({
-    url: '/article/'+id,
+    url: '/articles/'+id,
     method: 'get'
   })
 }
 
 export const editArticle = (data , aid) => {
   return axios.request({
-    url: '/article/'+ aid,
+    url: '/articles/'+ aid,
     data,
     method: 'put'
   })
@@ -38,7 +38,7 @@ export const editArticle = (data , aid) => {
 
 export const delArticle = (id) => {
   return axios.request({
-    url: '/article/'+id,
+    url: '/articles/'+id,
     method: 'delete'
   })
 }
