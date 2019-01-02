@@ -2,24 +2,26 @@
   <div>
     <Row>
       <Col span="8">
-        <Button type="primary" icon="plus-round" @click='addLayerShow'>添加文章</Button>
+        <Button type="primary" icon="plus-round" @click='addRowModal'>添加文章</Button>
       </Col>
     </Row>
     <Card>
-      <tables :columns="columns" v-model="propsData"></tables>
+      <tables :columns="columns" v-model="DataList"></tables>
       <Page class-name="mTop15" :total="pageTotal" :current="pageNum" :page-size="pageSize" show-elevator show-sizer
             show-total :page-size-opts="[10, 20, 50, 100, 200]"
             placement="top" @on-change="handlePage" @on-page-size-change='handlePageSize'></Page>
 
     </Card>
-    <modify :modalShow="modifyLayer" @on-close="closeModal"  @modify-finished="fetchData" :propsData="modifyLayerData" :channelData="channelList"></modify>
+    <modify :modalShow="modifyModalStatus" @on-close="closeModal"  @modify-finished="fetchTableData" :propsData="modifyRowData" :statusList="statusList" :channelData="channelList"></modify>
   </div>
 </template>
 
 <script>
   import Tables from '_c/tables'
-  import {getArticle, getArticleList, delArticle} from '@/api/article'
-  import Modify from './modify-article.vue'
+  import {getArticle, getArticleList, delArticle,saveArticleStatus} from '@/api/article'
+  import {getChannelList} from '@/api/channel'
+  import {statusList} from '@/config/params'
+  import Modify from './modify.vue'
   export default {
     name: 'tables_page',
     components: {
@@ -46,6 +48,34 @@
             key: 'short_title',
           },
           {
+            title: '是否启用',
+            key: 'status',
+            align: 'center',
+            render: (h, params) => {
+              return h('div', [
+                h('i-switch', {
+                  // 数据库1是启用，0是禁用
+                  props: {
+                    type: 'primary',
+                    value: params.row.status === 0
+                    // 控制开关的打开或关闭状态，官网文档属性是value
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    'on-change': (value) => {
+                      // 触发事件是on-change,用双引号括起来，
+                      // 参数value是回调值，并没有使用到
+                      this.switchRow(params.row.id,params.row.status)
+                      // params.index是拿到table的行序列，可以取到对应的表格值
+                    }
+                  }
+                })
+              ])
+            }
+          },
+          {
             title: '操作',
             key: 'handle',
             width: 200,
@@ -59,91 +89,119 @@
                     },
                     on: {
                       click: () => {
-                        this.editUser(params.row.id)
+                        this.modifyModal(params.row.id)
                       }
                     }
                   }, '修改'),
-                  h('Button', {
+                  // 删除使用 Poptip 进行一次确认
+                  h('Poptip', {
                     props: {
-                      type: 'error',
-                      size: 'small'
+                      confirm: true,
+                      title: '您确定要删除这条数据吗?',
+                      transfer: true
                     },
                     on: {
-                      click: () => {
-                        this.delArticle(params.row.id)
+                      'on-ok': () => {
+                        this.delRow(params.row.id)
                       }
                     }
-                  }, '删除')
+                  }, [
+                    h('Button', {
+                      style: {
+                        margin: '0 3px'
+                      },
+                      props: {
+                        type: 'error',
+                        placement: 'top',
+                        size: 'small'
+                      }
+                    }, '删除')
+                  ])
                 ])
               }
             ]
           }
 
         ],
-        propsData: {},
-        channelList:{},
-        modifyLayerData: {},
-        modifyLayer: false
+        DataList: [],
+        channelList:[],
+        statusList: statusList,
+        modifyRowData: {},
+        modifyModalStatus: false
       }
     },
     //存放axios方法
     methods: {
-      //page翻页
-      handlePage(value) {
-        this.pageNum = value;
-        this.fetchData();
-      },
-      handlePageSize(value) {
-        this.pageSize = value;
-        this.fetchData();
-      },
+
       //提交的axios
-      fetchData() {
+      fetchTableData() {
         getArticleList(this.pageNum, this.pageSize).then(res => {
           if (res.data.code === 0) {
-            this.propsData = res.data.data.list;
+            this.DataList = res.data.data.list;
             this.pageTotal = res.data.data.total;
           } else {
             alert(res.data.message);
           }
         })
       },
-      //添加
-      addLayerShow() {
-        this.openModal({})
-      },
-      //打开弹出层
-      openModal(data) {
-        this.$nextTick(() => {
-          this.modifyLayer = true
-          this.modifyLayerData = data
-        })
-      },
-      // 添加弹框
-      editUser(id) {
-        this.modifyLayerData = {};
-        this.fetchArticleData(id);
-        this.openModal(this.modifyLayerData)
-      },
-      fetchArticleData(id) {
+
+      fetchRowData(id) {
         getArticle(id).then(res => {
-          this.modifyLayerData = res.data.data
+          this.modifyRowData = res.data.data
         })
       },
+
+      //page翻页
+      handlePage(value) {
+        this.pageNum = value;
+        this.fetchTableData();
+      },
+      handlePageSize(value) {
+        this.pageSize = value;
+        this.fetchTableData();
+      },
+
+
+      // 添加记录弹框
+      addRowModal () {
+        this.$nextTick(() => {
+          this.modifyModalStatus = true
+          this.modifyRowData = {}
+        })
+      },
+
+      // 修改弹框
+      modifyModal (id) {
+        // 清空数据变量
+        this.modifyRowData = {}
+        //重新拉取本数据
+        this.fetchRowData(id)
+        this.$nextTick(() => {
+          this.modifyModalStatus = true
+        })
+      },
+
       //关闭弹出层
       closeModal(data) {
         this.$nextTick(() => {
           this.$emit('on-close', 'close');
-          this.modifyLayer = false;
+          this.modifyModalStatus = false;
         });
       },
-      delArticle(id) {
-        let _this = this;
-        delArticle(id).then(function (data) {
-          if (data.data.code === 0) {
+      fetchChannelData () {
+        // this.channelList = {};
+        getChannelList().then(res => {
+          this.channelList = res.data.data.list
+        })
+      },
 
-            _this.$Message.success('删除成功!');
-            _this.fetchData();
+      // 切换记录状态
+      switchRow (id, status) {
+        let _this = this;
+        saveArticleStatus(id, status===1?0:1).then(function (data) {
+          if (data.data.code === 0) {
+            _this.$Message.success('切换成功!');
+            _this.fetchTableData();
           } else {
             _this.$Message.error(data.data.message)
           }
@@ -153,17 +211,28 @@
           })
       },
 
-      fetchChannelData () {
-        this.channelList = {};
-        // getChannelList().then(res => {
-        //   this.channelList = res.data.data
-        // })
-      },
+      // 删除记录
+      delRow(id) {
+        let _this = this;
+        delArticle(id).then(function (data) {
+          console.log(data);
+          if (data.data.code === 0) {
+            _this.$Message.success('删除成功!');
+            _this.fetchTableData();
+          } else {
+            _this.$Message.error(data.data.message)
+          }
+        })
+          .catch(function (error) {
+            _this.$Message.error(error)
+          })
+      }
+
 
     },
     //调用axios获取页面初始化所需的数据
-    created() {
-      this.fetchData();
+    mounted() {
+      this.fetchTableData();
       this.fetchChannelData();
     }
 

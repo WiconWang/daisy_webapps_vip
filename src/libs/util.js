@@ -343,3 +343,16 @@ export const localSave = (key, value) => {
 export const localRead = (key) => {
   return localStorage.getItem(key) || ''
 }
+
+
+// 启用同步Ajax方案
+// axios默认异步，此处使用promise封装同步，并把结果返回给resolve,error返回给reject
+export const promiseAxios = (func, data) => {
+  return new Promise((resolve, reject) => {
+    eval(func)(data).then(res => {
+      resolve(res)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}

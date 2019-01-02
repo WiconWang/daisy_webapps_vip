@@ -1,7 +1,7 @@
 import axios from 'axios'
 import store from '@/store'
 import qs from 'qs'
-import {  getToken, getAccount } from '@/libs/util'
+import { setToken, getToken, setAccount, getAccount } from '@/libs/util'
 // import { Spin } from 'iview'
 const addErrorLog = errorInfo => {
   const { statusText, status, request: { responseURL } } = errorInfo
@@ -41,9 +41,9 @@ class HttpRequest {
       if (!Object.keys(this.queue).length) {
         // Spin.show() // 不建议开启，因为界面不友好
       }
-      this.queue[url] = true
-
-      if (config.method === 'post') {
+      this.queue[url] = true;
+      // POST方法，而且不是上传接口时，需要对数据进行qs处理
+      if (config.method === 'post' && (url.replace('/','').substring(0, 6) !== 'upload')) {
         config.headers = {
           'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
         }

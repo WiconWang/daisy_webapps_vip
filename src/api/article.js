@@ -42,3 +42,15 @@ export const delArticle = (id) => {
     method: 'delete'
   })
 }
+
+
+export const saveArticleStatus = (id,status) => {
+  const data = {
+    status: status
+  }
+  return axios.request({
+    url: '/status/articles/'+id,
+    data,
+    method: 'patch'
+  })
+}
