@@ -186,11 +186,11 @@
         switch (label) {
           case 'thumbnail':
             this.formValidate.thumbnail = content;
-            this.thumbnail_show = this.$config.baseDomain + content;
+            this.thumbnail_show = this.$config.uploadBase + content;
             break;
           case 'cover':
             this.formValidate.cover = content;
-            this.cover_show = this.$config.baseDomain + content;
+            this.cover_show = this.$config.uploadBase + content;
             break;
         }
       },
@@ -231,9 +231,9 @@
           this.formValidate.keyword = value.keyword;
           this.formValidate.description = value.description;
           this.formValidate.cover = value.cover;
-          this.cover_show = (value.cover=='' || value.cover.substring(0, 4) === 'http') ? value.cover : this.$config.baseDomain + value.cover;
+          this.cover_show = (value.cover=='' || value.cover.substring(0, 4) === 'http') ? value.cover : this.$config.uploadBase + value.cover;
           this.formValidate.thumbnail = value.thumbnail;
-          this.thumbnail_show = ( value.thumbnail=='' || value.thumbnail.substring(0, 4) === 'http'  ) ? value.thumbnail : this.$config.baseDomain + value.thumbnail;
+          this.thumbnail_show = ( value.thumbnail=='' || value.thumbnail.substring(0, 4) === 'http'  ) ? value.thumbnail : this.$config.uploadBase + value.thumbnail;
           this.formValidate.status = value.status;
           this.formValidate.weight = value.weight;
           this.formValidate.content = value.content;

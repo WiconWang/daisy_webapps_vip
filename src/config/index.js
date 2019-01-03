@@ -33,6 +33,7 @@ export default {
   },
   /**
    * 基础网站域名，主要用于图片访问使用
+   * 如果不希望暴露API相关服务器，可在服务器上做软链接，并在此处填写可访问的路径
    */
-  baseDomain: 'http://vip.daisy.hangyutech.com/'
+  uploadBase: 'http://api.daisy.hangyutech.com/storage/'
 }
