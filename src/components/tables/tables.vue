@@ -217,10 +217,10 @@ export default {
     handleTableData () {
       if (this.value.length) {
         this.insideTableData = this.value.map((item, index) => {
-        let res = item
-        res.initRowIndex = index
-        return res
-      })
+          let res = item
+          res.initRowIndex = index
+          return res
+        })
       }
     },
     exportCsv (params) {
@@ -267,7 +267,7 @@ export default {
     },
     value (val) {
       this.handleTableData()
-      this.handleSearch()
+      if (this.searchable) this.handleSearch()
     }
   },
   mounted () {

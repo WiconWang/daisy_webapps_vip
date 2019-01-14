@@ -1,8 +1,8 @@
 <template>
   <div>
-  <editor ref="editor" :value="content" @on-change="handleChange"/>
-  <button @click="changeContent">修改编辑器内容</button>
-</div>
+    <editor ref="editor" :value="content" @on-change="handleChange"/>
+    <Button @click="changeContent">修改编辑器内容</Button>
+  </div>
 </template>
 
 <script>

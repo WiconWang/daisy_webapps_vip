@@ -1,24 +1,33 @@
-# 项目和部署说明
+# install
 
 ## 依赖组件: 
-- Node.js Npm
-- Vue
+- Node v9.10 以上
+- npm v5.6 以上
+- Nginx 
+
+### dev
+修改vue.config.js中的代理链接 
+直接使用 npm run dev即可
 
 
-## 安装步骤
-1. 依赖库:
-> npm install
+### prod
+线上使用nginx代理方案,npm run build编译出dist，   
+1. git检出项目  
+2. 执行以下命令
+> npm run build  
 
-2.后端对接:
-> 修改vue.config.js中的后端API基准地址    
+另外，此命令在 git项目有变动时，均需要执行一次。
 
-如果使用daisy_platform则不需要其它配置。
+1.修改提交路径   src/config/index.js 中prod值
+3. 配置文件：src/config/index.js中    
+uploadBase，请更改为项目API的访问网址：
+> uploadBase: 'http://api.xxx.com.xxxx:8888/'
 
-3.运行项目:    
-- 线下直接使用 `npm run dev` 即可
-- 线上使用`nginx`读取`dist`方式，使用 `npm run build` 编译，然后配置下Nginx: 
+prod，请更改为项目API对应目录
+
+4. 对本站点配置nginx，根目录指向本项目下的dist，此目录会在第2条命令时生成
 ```
-   root /www/vip.daisy.com/dist;
+   root /www/wwwroot/xxx/xxx/dist;
   
    location  ^~ /member {
        proxy_set_header X-Scheme $scheme;
@@ -31,3 +40,5 @@
         try_files $uri $uri/ /index.html?$query_string;
     }
 ```
+
+部署完成以后，http://域名/ 可打开网站登陆页面，并使用超管后台开放的帐号密码进行登陆。

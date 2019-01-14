@@ -9,6 +9,18 @@ export const  statusList = [
   },
 ];
 
+export const  positionList = [
+  {
+    value: 'h',
+    label: '首页'
+  },
+  {
+    value: 'n',
+    label: '导航'
+  },
+];
+
+
 export const  levelList = [
   {
     value: 0,

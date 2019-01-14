@@ -127,6 +127,8 @@
   }
 </script>
 
-<style>
-
+<style lang="less">
+.editor-wrapper *{
+  z-index: 100 !important;
+}
 </style>
